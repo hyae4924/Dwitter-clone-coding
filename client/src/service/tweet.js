@@ -1,20 +1,19 @@
 export default class TweetService {
+  constructor(baseURL) {
+    this.baseURL = baseURL;
+  }
+
   async getTweets(username) {
-    let tweets;
+    const query = username ? `?username=${username}` : "";
     const requestOptions = {
       method: "GET",
       redirect: "follow",
     };
-    await fetch("http://localhost:8080/tweets", requestOptions)
-      .then(response => response.json())
-      .then(result => {
-        tweets = result;
-      })
-      .catch(error => console.log("error", error));
 
-    return username
-      ? tweets.filter(tweet => tweet.username === username)
-      : tweets;
+    const tweets = await fetch(`${this.baseURL}/tweets${query}`, requestOptions)
+      .then(rep => rep.json())
+      .catch(error => console.log("error", error));
+    return tweets;
   }
 
   async postTweet(text) {
@@ -33,33 +32,23 @@ export default class TweetService {
       body: raw,
       redirect: "follow",
     };
-    let tweet;
-    await fetch("http://localhost:8080/tweets", requestOptions)
-      .then(response => response.json())
-      .then(result => {
-        console.log(result);
-        tweet = result;
-      })
-      .catch(error => console.log("error", error));
 
+    const tweet = await fetch(`${this.baseURL}/tweets`, requestOptions)
+      .then(response => response.json())
+      .catch(error => console.log("error", error));
     return tweet;
   }
 
   async deleteTweet(tweetId) {
-    // this.tweets = this.tweets.filter(tweet => tweet.id !== tweetId);
     const requestOptions = {
       method: "DELETE",
       redirect: "follow",
     };
-
-    fetch(`http://localhost:8080/tweets/${tweetId}`, requestOptions) //
+    fetch(`${this.baseURL}/tweets/${tweetId}`, requestOptions) //
       .catch(error => console.log("error", error));
   }
 
   async updateTweet(tweetId, text) {
-    // if (!tweet) {
-    //   throw new Error("tweet not found!");
-    // }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -73,12 +62,11 @@ export default class TweetService {
       body: raw,
       redirect: "follow",
     };
-    let tweet;
-    await fetch(`http://localhost:8080/tweets/${tweetId}`, requestOptions)
+    const tweet = await fetch(
+      `${this.baseURL}/tweets/${tweetId}`,
+      requestOptions
+    )
       .then(response => response.json())
-      .then(result => {
-        tweet = result;
-      })
       .catch(error => console.log("error", error));
 
     return tweet;
