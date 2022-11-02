@@ -3,39 +3,38 @@ import tweets from "../archive/tweet.js";
 const router = express.Router();
 
 // 1.get all tweets for user's username
-router.get("/", (req, res, next) => {
-  if (!!req.query) return next();
-  const filterd = tweets.filter(item => {
-    if (item.username === req.query.username) return true;
-  });
-  res.send(filterd);
-});
-
 // 2.get all tweets
 router.get("/", (req, res) => {
-  res.send(tweets);
+  const username = req.query.username;
+  const data = username
+    ? tweets.filter(tweet => Number(tweet.id) === Number(username.id))
+    : tweets;
+  res.json(data);
 });
 
 // 3.get tweet by id
 router.get("/:id", (req, res) => {
-  const filterd = tweets.filter(item => {
-    if (item.id === Number(req.params.id)) return true;
-  });
-  res.send(filterd);
+  const finded = tweets.find(item => item.id === Number(req.params.id));
+  res.json(finded);
 });
 
 // 4. creating new tweet
 router.post("/", (req, res) => {
   const { name, username, text } = req.body;
-  const newTweet = {
-    id: Math.random(),
-    text,
-    name,
-    username,
-    createdAt: new Date().toISOString(),
-  };
-  tweets.push(newTweet);
-  res.send(newTweet);
+  if (name && username && text) {
+    const newTweet = {
+      id: Math.random(),
+      text,
+      name,
+      username,
+      createdAt: new Date().toISOString(),
+    };
+    tweets.unshift(newTweet);
+    res.status(201).json(newTweet);
+  } else
+    res
+      .status(400)
+      .json({ mesage: "Please enter your username, text and name" });
 });
 
 // 5. updating tweet
@@ -51,16 +50,15 @@ router.put("/:id", (req, res) => {
   });
   finded.text = text;
   tweets[index] = finded;
-  res.send(finded);
+  res.json(finded);
 });
 
 // 6. delete tweet
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  let index = tweets.findIndex(item => {
-    if (item.id === id) return true;
-  });
+  let index = tweets.findIndex(item => item.id == id);
   tweets.splice(index, 1);
+  console.log(tweets);
   res.status(204).end();
 });
 
