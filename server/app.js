@@ -6,9 +6,9 @@ import tweetsRouter from "./router/tweets.js";
 
 const app = express();
 
-app.use(helmet());
 app.use(express.json()); // REST API의 body를 조회가능하게해줌 (내부미들웨어)
 app.use(cors()); //Simple Usage (Enable All CORS Requests)
+app.use(helmet());
 app.use(moran("tiny")); // show log
 
 app.use("/tweets", tweetsRouter);
