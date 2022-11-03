@@ -1,6 +1,6 @@
 import express from "express";
 import * as tweetController from "../controller/tweet.js";
-
+import * as validator from "../middleware/validator.js";
 const router = express.Router();
 
 // 1.get all tweets for user's username
@@ -11,10 +11,10 @@ router.get("/", tweetController.getTweets);
 router.get("/:id", tweetController.getTweetById);
 
 // 4. creating new tweet
-router.post("/", tweetController.createTweet);
+router.post("/", validator.createTweet, tweetController.createTweet);
 
 // 5. updating tweet
-router.put("/:id", tweetController.updateTweet);
+router.put("/:id", validator.updateTweet, tweetController.updateTweet);
 
 // 6. delete tweet
 router.delete("/:id", tweetController.removeTweet);
