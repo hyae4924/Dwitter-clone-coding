@@ -1,32 +1,33 @@
 export default class TweetService {
-  constructor(http) {
+  constructor(http, tokenStorage) {
     this.http = http;
+    this.tokenStorage = tokenStorage;
   }
 
+  getHeder() {
+    const token = this.tokenStorage.getToken();
+    return { Authorization: `Bearer ${token}` };
+  }
   // -------------------
   async getTweets(username) {
     const query = username ? `?username=${username}` : "";
     const requestOptions = {
       method: "GET",
       redirect: "follow",
+      headers: this.getHeder(),
     };
     return this.http.fetch(`/tweets${query}`, requestOptions);
   }
 
   // -------------------
   async postTweet(text) {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
     const raw = JSON.stringify({
       text,
-      username: "ellie",
-      name: "ellie",
     });
 
     const requestOptions = {
       method: "POST",
-      headers: myHeaders,
+      headers: { ...this.getHeder(), "Content-Type": "application/json" },
       body: raw,
       redirect: "follow",
     };
@@ -40,22 +41,20 @@ export default class TweetService {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow",
+      headers: this.getHeder(),
     };
     return this.http.fetch(`/tweets/${tweetId}`, requestOptions);
   }
 
   // -------------------
   async updateTweet(tweetId, text) {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
     const raw = JSON.stringify({
       text,
     });
 
     const requestOptions = {
       method: "PUT",
-      headers: myHeaders,
+      headers: { ...this.getHeder(), "Content-Type": "application/json" },
       body: raw,
       redirect: "follow",
     };

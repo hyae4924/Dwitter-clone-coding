@@ -1,5 +1,5 @@
 import * as tweetRepository from "../data/tweet.js";
-
+import * as userRepository from "../data/user.js";
 export const getTweets = async (req, res) => {
   const username = req.query.username;
   const data = username
@@ -16,8 +16,9 @@ export const getTweetById = async (req, res) => {
 };
 
 export const createTweet = async (req, res) => {
-  const { userId, text } = req.body;
-  const newTweet = await tweetRepository.create(userId, text);
+  const { text } = req.body;
+  const user = await userRepository.findByusername(req.username);
+  const newTweet = await tweetRepository.create(user.id, text);
   res.status(201).json(newTweet);
 };
 

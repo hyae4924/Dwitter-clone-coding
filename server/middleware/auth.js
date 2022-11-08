@@ -7,6 +7,7 @@ const jwtKey = process.env.JWT_KEY;
 
 export const isAuth = async (req, res, next) => {
   const authHeader = req.get("Authorization");
+  console.log(authHeader);
   if (!(authHeader && authHeader.startsWith("Bearer "))) {
     return res.status(401).json({ message: "Authorization error" });
   }

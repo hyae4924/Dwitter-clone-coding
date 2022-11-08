@@ -2,6 +2,7 @@ export default class httpClient {
   constructor(baseURL) {
     this.baseURL = baseURL;
   }
+
   async fetch(url, requestOptions) {
     const response = await fetch(`${this.baseURL}${url}`, requestOptions);
 

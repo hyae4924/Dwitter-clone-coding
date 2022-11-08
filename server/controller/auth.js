@@ -5,8 +5,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const jwtKey = process.env.JWT_KEY;
-const createAccesToken = async username => {
-  const accestoken = await jwt.sign(
+const createToken = async username => {
+  const token = await jwt.sign(
     {
       username,
     },
@@ -15,7 +15,7 @@ const createAccesToken = async username => {
       expiresIn: 60 * 60 * 24,
     }
   );
-  return accestoken;
+  return token;
 };
 
 export const signup = async (req, res) => {
@@ -30,12 +30,13 @@ export const signup = async (req, res) => {
     email,
     url
   );
-  const accestoken = await createAccesToken(username);
-  res.json({ accestoken, name: newUser.name });
+  const token = await createToken(username);
+  res.json({ token, name: newUser.name });
 };
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
+  console.log(22222);
   const user = await userRepository.findByusername(username);
   if (!user)
     return res.status(401).json({ message: "invalid user or password" });
@@ -43,8 +44,8 @@ export const login = async (req, res) => {
   if (!isValidPassword)
     return res.status(401).json({ message: "invalid user or password" });
 
-  const accestoken = await createAccesToken(username);
-  res.json({ accestoken, name: user.name });
+  const token = await createToken(username);
+  res.json({ token, name: user.name });
 };
 
 export const me = (req, res) => {

@@ -8,8 +8,8 @@ import { isAuth } from "../middleware/auth.js";
 const router = express.Router();
 
 const validateCreate = [
-  body("userId").notEmpty().withMessage("please enter userId"),
   body("text").notEmpty().withMessage("please enter text"),
+  // body("userId").notEmpty().withMessage("please enter userId"),
   validator,
 ];
 
