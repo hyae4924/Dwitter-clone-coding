@@ -28,12 +28,27 @@ export const updateTweet = async (req, res) => {
   const found = await tweetRepository.getById(id);
   if (!found)
     return res.status(404).json({ message: `Tweet id${id} does not exist` });
-  const updated = await tweetRepository.update(id, text);
-  res.status(200).json(updated);
+
+  const user = await userRepository.findByusername(req.username);
+
+  if (user.id !== found.userId)
+    return res.stats(403).json({ message: "no authorization" });
+  else {
+    const updated = await tweetRepository.update(id, text);
+    res.status(200).json(updated);
+  }
 };
 
 export const removeTweet = async (req, res) => {
   const { id } = req.params;
-  await tweetRepository.remove(id);
-  res.status(204).end();
+  const found = await tweetRepository.getById(id);
+  if (!found)
+    return res.status(404).json({ message: `Tweet id${id} does not exist` });
+  const user = await userRepository.findByusername(req.username);
+  if (user.id !== found.userId)
+    return res.status(403).json({ message: "no authorization" });
+  else {
+    await tweetRepository.remove(id);
+    return res.status(204).json({ message: "Delete success" });
+  }
 };
