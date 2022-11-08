@@ -1,34 +1,52 @@
+import dotenv from "dotenv";
+dotenv.config();
 import * as userRepository from "../data/user.js";
-import * as jwtRepository from "../middleware/jwt.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-export const signUp = async (req, res) => {
-  const { userId, password, username, email, profile_picture } = req.body;
-  const user = userRepository.findUser(userId);
-  if (user)
-    return res.status(409).json({ message: "userId is already exists" });
+const jwtKey = process.env.JWT_KEY;
+const createAccesToken = async username => {
+  const accestoken = await jwt.sign(
+    {
+      username,
+    },
+    jwtKey,
+    {
+      expiresIn: 60 * 60 * 24,
+    }
+  );
+  return accestoken;
+};
+
+export const signup = async (req, res) => {
+  const { username, password, name, email, url } = req.body;
+  const user = await userRepository.findByusername(username);
+  if (user) return res.status(409).json({ message: "already exists" });
+  const hashed = await bcrypt.hash(password, 10);
   const newUser = await userRepository.createUser(
-    userId,
-    password,
     username,
+    hashed,
+    name,
     email,
-    profile_picture
+    url
   );
-  const accestoken = await jwtRepository.createAccesToken(userId, username);
-  res.json({ accestoken, username: newUser.username });
+  const accestoken = await createAccesToken(username);
+  res.json({ accestoken, name: newUser.name });
 };
 
-export const logIn = async (req, res) => {
-  const { userId, password } = req.body;
-  const user = userRepository.findUser(userId, password);
-  const accestoken = await jwtRepository.createAccesToken(
-    userId,
-    user.username
-  );
-  res.json({ accestoken, username: user.username });
+export const login = async (req, res) => {
+  const { username, password } = req.body;
+  const user = await userRepository.findByusername(username);
+  if (!user)
+    return res.status(401).json({ message: "invalid user or password" });
+  const isValidPassword = await bcrypt.compare(password, user.password);
+  if (!isValidPassword)
+    return res.status(401).json({ message: "invalid user or password" });
+
+  const accestoken = await createAccesToken(username);
+  res.json({ accestoken, name: user.name });
 };
-export const me = async (req, res) => {
-  const { authorization } = req.headers;
-  const token = await jwtRepository.checkToken(authorization.split(" ")[1]);
-  if (token) return res.json({ token, username: token.username });
-  else return res.status(401).json({ message: "Unauthorized" });
+
+export const me = (req, res) => {
+  res.json({ token: req.token, username: req.username });
 };

@@ -1,35 +1,54 @@
+import * as userRepository from "../data/user.js";
 const tweets = [
   {
-    id: 1,
-    text: "드림코딩에서 강의 들으면 너무 좋으다",
-    createdAt: "2021-05-09T04:20:57.000Z",
-    name: "Bob",
-    username: "Bob",
+    id: "1",
+    text: "인생사 새옹지마",
+    createdAt: new Date().toString(),
+    userId: "1",
+  },
+  {
+    id: "2",
+    text: "인생은 폼생폼사",
+    createdAt: new Date().toString(),
+    userId: "1",
   },
 ];
 
+// review
 export async function getAll() {
-  return tweets;
+  return Promise.all(
+    tweets.map(async tweet => {
+      const { username, name, url } = await userRepository.findbyId(
+        tweet.userId
+      );
+      return { ...tweet, username, name, url };
+    })
+  );
 }
 
 export async function getAllByUsername(username) {
+  const tweets = await getAll();
+  console.log(tweets);
   return tweets.filter(tweet => tweet.username === username);
 }
 
 export async function getById(id) {
-  return tweets.find(tweet => tweet.id === id);
+  const found = tweets.find(tweet => tweet.id === id);
+  if (!found) return null;
+  const { username, name, url } = await userRepository.findbyId(found.userId);
+  return { ...found, username, name, url };
 }
 
-export async function create(name, username, text) {
+export async function create(userId, text) {
   const newTweet = {
-    id: Math.random(),
+    id: new Date().toString(),
     text,
-    name,
-    username,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date().toString(),
+    userId,
   };
   tweets.unshift(newTweet);
-  return newTweet;
+
+  return getById(newTweet.id);
 }
 
 export async function update(id, text) {
@@ -42,7 +61,7 @@ export async function update(id, text) {
   });
   finded.text = text;
   tweets[index] = finded;
-  return finded;
+  return getById(finded.id);
 }
 
 export async function remove(id) {

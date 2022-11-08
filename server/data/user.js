@@ -1,34 +1,40 @@
-import bcrypt from "bcrypt";
-import dotenv from "dotenv";
-dotenv.config();
-const users = [];
+// user schema
+// {
+//   id: string // 사용자의 고유한 아이디
+//   username: string,  // 사용자 닉네임 (아이디)
+//   password: string,  // 사용자 비밀번호
+//   name: string,  // 사용자 이름
+//   email: string,  // 사용자 이메일
+//   url: string (optional) // 사용자 프로파일 사진 URL
+// }
 
-export const createUser = async (
-  userId,
-  password,
-  username,
-  email,
-  profile_picture
-) => {
+const users = [
+  {
+    id: "1",
+    username: "hyae4924",
+    password: "$2b$10$16ESMKrLOnBwGSPYeOUSgue3DD8zfrLI4hkeiVy5Jn5MGM96J6oAG",
+    name: "jiwoong",
+    email: "hyae4924@naver.com",
+    url: "",
+  },
+];
+
+export const createUser = async (username, password, name, email, url) => {
   const newUser = {
-    id: new Date(),
-    userId,
-    password: await bcrypt.hash(password, 10),
+    id: new Date().toString(),
     username,
+    password,
+    name,
     email,
-    profile_picture,
+    url,
   };
   users.push(newUser);
-  console.log("$$$$$$$$", users);
   return newUser;
 };
 
-export const findUser = (userId, password) => {
-  const user = password
-    ? users.find(
-        user =>
-          user.userId === userId && bcrypt.compareSync(password, user.password)
-      )
-    : users.find(user => user.userId === userId);
-  return user || false;
+export const findbyId = async userId => {
+  return users.find(user => user.id === userId);
+};
+export const findByusername = async username => {
+  return users.find(user => user.username === username);
 };
