@@ -1,18 +1,16 @@
-import dotenv from "dotenv";
-dotenv.config();
 import * as userRepository from "../data/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import config from "../config.js";
 
-const jwtKey = process.env.JWT_KEY;
 const createToken = async username => {
   const token = await jwt.sign(
     {
       username,
     },
-    jwtKey,
+    config.jwt.secretKey,
     {
-      expiresIn: 60 * 60 * 24,
+      expiresIn: config.jwt.expires,
     }
   );
   return token;
@@ -22,7 +20,7 @@ export const signup = async (req, res) => {
   const { username, password, name, email, url } = req.body;
   const user = await userRepository.findByusername(username);
   if (user) return res.status(409).json({ message: "already exists" });
-  const hashed = await bcrypt.hash(password, 10);
+  const hashed = await bcrypt.hash(password, config.bcrypt.saltRound);
   const newUser = await userRepository.createUser(
     username,
     hashed,
@@ -36,7 +34,6 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
-  console.log(22222);
   const user = await userRepository.findByusername(username);
   if (!user)
     return res.status(401).json({ message: "invalid user or password" });
