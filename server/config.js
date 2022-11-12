@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+
 function required(key, defaultValue = undefined) {
   const value = process.env[key] || defaultValue;
   if (value == undefined) throw new Error(`config ${key} is  undefined`);
@@ -7,7 +8,7 @@ function required(key, defaultValue = undefined) {
 }
 const config = {
   jwt: {
-    secretKey: required("JWT_KEY"),
+    secretKey: required("JWT_KEY", "dasfasf"),
     expires: parseInt(required("JWT_EXPIRES", 86400)),
   },
   bcrypt: {
@@ -16,7 +17,12 @@ const config = {
   host: {
     port: parseInt(required("HOST_PORT", 8080)),
   },
+  db: {
+    host: required("DB_HOST", "localhost"),
+    user: required("DB_USER", "root"),
+    database: required("DB_DATABASE", "dwitter"),
+    password: required("DB_PASSWORD", ""),
+  },
 };
-console.log("___follow is config set___");
-console.dir(config, { depth: 2, showHidden: true });
+
 export default config;
