@@ -1,70 +1,42 @@
 import * as userRepository from "../data/user.js";
-const tweets = [
-  {
-    id: "1",
-    text: "인생사 새옹지마",
-    createdAt: new Date().toString(),
-    userId: "1",
-  },
-  {
-    id: "2",
-    text: "인생은 폼생폼사",
-    createdAt: new Date().toString(),
-    userId: "1",
-  },
-];
+import { db } from "../DB/database.js";
 
-// review
+const leftJoin =
+  "select t.id,t.text,t.createdAt,t.userId,u.username,u.name,u.url from tweets as t left join users as u on u.id=t.userId";
+const orderBy = "order by t.createdAt desc";
 export async function getAll() {
-  return Promise.all(
-    tweets.map(async tweet => {
-      const { username, name, url } = await userRepository.findbyId(
-        tweet.userId
-      );
-      return { ...tweet, username, name, url };
-    })
-  );
+  return db.query(`${leftJoin} ${orderBy} `).then(result => result[0]);
 }
 
 export async function getAllByUsername(username) {
-  const tweets = await getAll();
-  console.log(tweets);
-  return tweets.filter(tweet => tweet.username === username);
+  return db
+    .query(`${leftJoin} where u.username=? ${orderBy}`, [username])
+    .then(result => result[0]);
 }
 
 export async function getById(id) {
-  const found = tweets.find(tweet => tweet.id === id);
-  if (!found) return null;
-  const { username, name, url } = await userRepository.findbyId(found.userId);
-  return { ...found, username, name, url };
+  return db.query(`${leftJoin} where t.id=? ${orderBy}`, [id]).then(result => {
+    console.log(result[0][0]);
+    return result[0][0];
+  });
 }
 
 export async function create(userId, text) {
-  const newTweet = {
-    id: new Date().toString(),
-    text,
-    createdAt: new Date().toString(),
-    userId,
-  };
-  tweets.unshift(newTweet);
-
-  return getById(newTweet.id);
+  return db
+    .query(`insert into tweets (text,createdAt,userId) values(?,?,?)`, [
+      text,
+      new Date(),
+      userId,
+    ])
+    .then(result => getById(result[0].insertId));
 }
 
 export async function update(id, text) {
-  let index;
-  const finded = tweets.find((item, idx) => {
-    if (Number(item.id) === Number(id)) {
-      index = idx;
-      return true;
-    }
-  });
-  finded.text = text;
-  tweets[index] = finded;
-  return getById(finded.id);
+  return db
+    .query(`update tweets set text=? where id=?`, [text, id])
+    .then(result => getById(id));
 }
 
 export async function remove(id) {
-  let index = tweets.findIndex(item => item.id == id);
-  tweets.splice(index, 1);
+  db.query(`delete from tweets  where id=?`, [id]);
 }
