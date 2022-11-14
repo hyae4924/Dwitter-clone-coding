@@ -1,4 +1,4 @@
-import { Users } from "../DB/database.js";
+import { Users } from "../model.js";
 export const createUser = async (username, password, name, email, url) => {
   return Users.create({ username, password, name, email, url });
 };

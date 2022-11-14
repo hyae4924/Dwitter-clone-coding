@@ -5,7 +5,7 @@ import helmet from "helmet";
 import tweetsRouter from "./router/tweets.js";
 import authRouter from "./router/auth.js";
 import config from "./config.js";
-import { sequelize } from "./DB/database.js";
+import { sq } from "./DB/database.js";
 const app = express();
 
 app.use(express.json()); // REST API의 body를 조회가능하게해줌 (내부미들웨어)
@@ -23,6 +23,6 @@ app.use((err, req, res, next) => {
   console.error(err);
   res.status(500);
 });
-sequelize.sync();
+sq.sync();
 
 app.listen(config.host.port);

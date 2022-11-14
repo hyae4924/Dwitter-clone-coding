@@ -1,4 +1,4 @@
-import { Users, Tweets } from "../DB/database.js";
+import { Users, Tweets } from "../model.js";
 import { Sequelize } from "sequelize";
 
 const incloudUserOp = {
