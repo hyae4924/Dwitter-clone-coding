@@ -1,42 +1,62 @@
-import * as userRepository from "../data/user.js";
-import { db } from "../DB/database.js";
+import { Users, Tweets } from "../DB/database.js";
+import { Sequelize } from "sequelize";
 
-const leftJoin =
-  "select t.id,t.text,t.createdAt,t.userId,u.username,u.name,u.url from tweets as t left join users as u on u.id=t.userId";
-const orderBy = "order by t.createdAt desc";
+const incloudUserOp = {
+  attributes: [
+    "id",
+    "text",
+    "createdAt",
+    "userId",
+    [Sequelize.col("user.name"), "name"],
+    [Sequelize.col("user.username"), "username"],
+    [Sequelize.col("user.url"), "url"],
+  ],
+  include: {
+    model: Users,
+    attributes: [],
+  },
+};
+const orderOP = { order: [["createdAt", "DESC"]] };
 export async function getAll() {
-  return db.query(`${leftJoin} ${orderBy} `).then(result => result[0]);
+  return Tweets.findAll({ ...incloudUserOp, ...orderOP, raw: true });
 }
 
 export async function getAllByUsername(username) {
-  return db
-    .query(`${leftJoin} where u.username=? ${orderBy}`, [username])
-    .then(result => result[0]);
-}
-
-export async function getById(id) {
-  return db.query(`${leftJoin} where t.id=? ${orderBy}`, [id]).then(result => {
-    console.log(result[0][0]);
-    return result[0][0];
+  return Tweets.findAll({
+    ...incloudUserOp,
+    ...orderOP,
+    include: {
+      ...incloudUserOp.include,
+      where: { username },
+    },
   });
 }
 
+export async function getById(id) {
+  return Tweets.findOne({
+    ...incloudUserOp,
+    where: { id: Number(id) },
+  }).then(tweet => tweet.dataValues);
+}
+
 export async function create(userId, text) {
-  return db
-    .query(`insert into tweets (text,createdAt,userId) values(?,?,?)`, [
-      text,
-      new Date(),
-      userId,
-    ])
-    .then(result => getById(result[0].insertId));
+  return Tweets.create({
+    userId,
+    text,
+    createdAt: new Date(),
+  }).then(tweet => getById(tweet.dataValues.id));
 }
 
 export async function update(id, text) {
-  return db
-    .query(`update tweets set text=? where id=?`, [text, id])
-    .then(result => getById(id));
+  return Tweets.findByPk(id, incloudUserOp) //
+    .then(tweet => {
+      tweet.text = text;
+      return tweet.save();
+    });
 }
 
 export async function remove(id) {
-  db.query(`delete from tweets  where id=?`, [id]);
+  return Tweets.destroy({ where: { id } });
+  // return Tweets.findByPk(id) //
+  //   .then(tweet => tweet.destroy());
 }
