@@ -1,4 +1,4 @@
-import * as userRepository from "../data/user.js";
+import * as userRepository from "../model/data/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import config from "../config.js";

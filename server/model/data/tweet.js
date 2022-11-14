@@ -1,5 +1,5 @@
-import * as userRepository from "../data/user.js";
-import { db } from "../DB/database.js";
+import * as userRepository from "./user.js";
+import { db } from "../../DB/database.js";
 
 const leftJoin =
   "select t.id,t.text,t.createdAt,t.userId,u.username,u.name,u.url from tweets as t left join users as u on u.id=t.userId";
@@ -16,7 +16,6 @@ export async function getAllByUsername(username) {
 
 export async function getById(id) {
   return db.query(`${leftJoin} where t.id=? ${orderBy}`, [id]).then(result => {
-    console.log(result[0][0]);
     return result[0][0];
   });
 }

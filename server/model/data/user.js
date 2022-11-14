@@ -1,4 +1,4 @@
-import { db } from "../DB/database.js";
+import { db } from "../../DB/database.js";
 
 export const createUser = async (username, password, name, email, url) => {
   const userId = await db

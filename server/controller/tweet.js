@@ -1,5 +1,5 @@
-import * as tweetRepository from "../data/tweet.js";
-import * as userRepository from "../data/user.js";
+import * as tweetRepository from "../model/data/tweet.js";
+import * as userRepository from "../model/data/user.js";
 export const getTweets = async (req, res) => {
   const username = req.query.username;
   const data = username
@@ -41,9 +41,7 @@ export const updateTweet = async (req, res) => {
 
 export const removeTweet = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const found = await tweetRepository.getById(id);
-  console.log(found);
   if (!found)
     return res.status(404).json({ message: `Tweet id${id} does not exist` });
   const user = await userRepository.findByusername(req.username);
