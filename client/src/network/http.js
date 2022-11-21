@@ -4,7 +4,12 @@ export default class httpClient {
   }
 
   async fetch(url, requestOptions) {
-    const response = await fetch(`${this.baseURL}${url}`, requestOptions);
+    const option = {
+      ...requestOptions,
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    };
+    const response = await fetch(`${this.baseURL}${url}`, option);
 
     let data;
     try {

@@ -15,13 +15,14 @@ const validateSignup = [
   validator,
 ];
 
-const validateSignin = [
+const validatelogin = [
   body("username").notEmpty().withMessage("please enter username"),
   body("password").notEmpty().withMessage("please enter password"),
   validator,
 ];
 
 router.post("/signup", validateSignup, authController.signup);
-router.post("/login", validateSignin, authController.login);
+router.post("/login", validatelogin, authController.login);
+router.post("/logout", isAuth, authController.logout);
 router.get("/me", isAuth, authController.me);
 export default router;

@@ -8,14 +8,12 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { AuthErrorEventBus } from "./context/AuthContext";
 import HttpClient from "./network/http.js";
-import TokenStorage from "./localDB/token";
 
 const baseURL = process.env.REACT_APP_BASE_URL;
 const httpClient = new HttpClient(baseURL);
-const tokenStorage = new TokenStorage();
 const authErrorEventBus = new AuthErrorEventBus();
-const authService = new AuthService(httpClient, tokenStorage);
-const tweetService = new TweetService(httpClient, tokenStorage);
+const authService = new AuthService(httpClient);
+const tweetService = new TweetService(httpClient);
 
 ReactDOM.render(
   <React.StrictMode>

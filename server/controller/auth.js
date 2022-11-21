@@ -16,6 +16,16 @@ const createToken = async username => {
   return token;
 };
 
+const setToken = async (res, token) => {
+  const option = {
+    maxAge: config.jwt.expires * 1000,
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+  };
+  res.cookie("token", token, option);
+};
+
 export const signup = async (req, res) => {
   const { username, password, name, email, url } = req.body;
   const user = await userRepository.findByusername(username);
@@ -29,7 +39,8 @@ export const signup = async (req, res) => {
     url
   );
   const token = await createToken(username);
-  res.json({ token, name: newUser.name });
+  await setToken(res, token);
+  res.json({ name: newUser.username });
 };
 
 export const login = async (req, res) => {
@@ -42,9 +53,16 @@ export const login = async (req, res) => {
     return res.status(401).json({ message: "invalid user or password" });
 
   const token = await createToken(username);
-  res.json({ token, name: user.name });
+  await setToken(res, token);
+  res.json({ username: user.username });
 };
 
 export const me = (req, res) => {
-  res.json({ token: req.token, username: req.username });
+  res.json({ username: req.username });
+};
+
+export const logout = (req, res) => {
+  console.log(2);
+  res.clearCookie("token");
+  res.json({ message: "You are logged out" });
 };
