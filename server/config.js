@@ -26,6 +26,9 @@ const config = {
   cors: {
     allowedOrigin: required("CORS_ALLOW_ORIGIN"),
   },
+  csrf: {
+    key: required("CSRF_SECRET_KEY"),
+  },
 };
 
 export default config;

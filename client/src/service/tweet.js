@@ -18,13 +18,11 @@ export default class TweetService {
     const raw = JSON.stringify({
       text,
     });
-
     const requestOptions = {
       method: "POST",
       body: raw,
       redirect: "follow",
     };
-
     return this.http.fetch(`/tweets`, requestOptions);
   }
 

@@ -26,6 +26,11 @@ const setToken = async (res, token) => {
   res.cookie("token", token, option);
 };
 
+const createCsrfToken = async () => {
+  return bcrypt.hash(config.csrf.key, 2);
+};
+
+//-------------------------------------------------
 export const signup = async (req, res) => {
   const { username, password, name, email, url } = req.body;
   const user = await userRepository.findByusername(username);
@@ -42,7 +47,7 @@ export const signup = async (req, res) => {
   await setToken(res, token);
   res.json({ name: newUser.username });
 };
-
+//-------------------------------------------------
 export const login = async (req, res) => {
   const { username, password } = req.body;
   const user = await userRepository.findByusername(username);
@@ -56,13 +61,17 @@ export const login = async (req, res) => {
   await setToken(res, token);
   res.json({ username: user.username });
 };
-
+//-------------------------------------------------
 export const me = (req, res) => {
   res.json({ username: req.username });
 };
-
+//-------------------------------------------------
 export const logout = (req, res) => {
-  console.log(2);
   res.clearCookie("token");
   res.json({ message: "You are logged out" });
+};
+//-------------------------------------------------
+export const csrf = async (req, res) => {
+  const csrfToken = await createCsrfToken();
+  return res.status(200).json({ csrfToken });
 };

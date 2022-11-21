@@ -25,4 +25,5 @@ router.post("/signup", validateSignup, authController.signup);
 router.post("/login", validatelogin, authController.login);
 router.post("/logout", isAuth, authController.logout);
 router.get("/me", isAuth, authController.me);
+router.get("/csrf", authController.csrf);
 export default router;

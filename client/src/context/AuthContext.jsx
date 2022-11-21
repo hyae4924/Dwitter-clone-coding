@@ -7,26 +7,31 @@ import {
   useImperativeHandle,
   useMemo,
   useState,
-} from 'react';
-import Header from '../components/Header';
-import Login from '../pages/Login';
+} from "react";
+import Header from "../components/Header";
+import Login from "../pages/Login";
 
 const AuthContext = createContext({});
-
+const csrfRef = createRef();
 const contextRef = createRef();
 
 export function AuthProvider({ authService, authErrorEventBus, children }) {
   const [user, setUser] = useState(undefined);
+  const [csrfToken, setCsrfToken] = useState(undefined);
 
   useImperativeHandle(contextRef, () => (user ? user.token : undefined));
+  useImperativeHandle(csrfRef, () => csrfToken);
 
   useEffect(() => {
-    authErrorEventBus.listen((err) => {
+    authErrorEventBus.listen(err => {
       console.log(err);
       setUser(undefined);
     });
   }, [authErrorEventBus]);
 
+  useEffect(() => {
+    authService.csrfToken().then(setCsrfToken).catch(console.error);
+  }, [authService]);
   useEffect(() => {
     authService.me().then(setUser).catch(console.error);
   }, [authService]);
@@ -35,13 +40,13 @@ export function AuthProvider({ authService, authErrorEventBus, children }) {
     async (username, password, name, email, url) =>
       authService
         .signup(username, password, name, email, url)
-        .then((user) => setUser(user)),
+        .then(user => setUser(user)),
     [authService]
   );
 
   const logIn = useCallback(
     async (username, password) =>
-      authService.login(username, password).then((user) => setUser(user)),
+      authService.login(username, password).then(user => setUser(user)),
     [authService]
   );
 
@@ -65,7 +70,7 @@ export function AuthProvider({ authService, authErrorEventBus, children }) {
       {user ? (
         children
       ) : (
-        <div className='app'>
+        <div className="app">
           <Header />
           <Login onSignUp={signUp} onLogin={logIn} />
         </div>
@@ -85,4 +90,5 @@ export class AuthErrorEventBus {
 
 export default AuthContext;
 export const fetchToken = () => contextRef.current;
+export const fetchCsrfToken = () => csrfRef.current;
 export const useAuth = () => useContext(AuthContext);

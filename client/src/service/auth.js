@@ -55,4 +55,12 @@ export default class AuthService {
     const data = await this.http.fetch("/auth/logout", requestOptions);
     return data;
   }
+  async csrfToken() {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow",
+    };
+    const data = await this.http.fetch("/auth/csrf", requestOptions);
+    return data.csrfToken;
+  }
 }

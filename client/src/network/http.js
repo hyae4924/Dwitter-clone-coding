@@ -1,13 +1,18 @@
 export default class httpClient {
-  constructor(baseURL) {
+  constructor(baseURL, authErrorEventBus, getCsrfToken) {
     this.baseURL = baseURL;
+    this.authErrorEventBus = authErrorEventBus;
+    this.getCsrfToken = getCsrfToken;
   }
 
   async fetch(url, requestOptions) {
     const option = {
       ...requestOptions,
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Csrf-Token": this.getCsrfToken(),
+      },
     };
     const response = await fetch(`${this.baseURL}${url}`, option);
 
