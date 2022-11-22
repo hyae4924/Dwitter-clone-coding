@@ -29,6 +29,11 @@ const config = {
   csrf: {
     key: required("CSRF_SECRET_KEY"),
   },
+
+  rateLimit: {
+    windowMs: required("RATE_LIMIT_WINDOWMS", 60000),
+    max: required("RATE_LIMIT_MAX", 100),
+  },
 };
 
 export default config;

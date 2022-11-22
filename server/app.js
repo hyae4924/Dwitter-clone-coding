@@ -8,6 +8,7 @@ import authRouter from "./router/auth.js";
 import config from "./config.js";
 import { db } from "./DB/database.js";
 import { isCsrf } from "./middleware/csrf.js";
+import rateLimit from "./middleware/rateLimit.js";
 const app = express();
 const corsOptions = {
   origin: config.cors.allowedOrigin,
@@ -19,6 +20,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(moran("tiny")); // show log
+app.use(rateLimit);
 app.use(isCsrf);
 app.use("/tweets", tweetsRouter);
 app.use("/auth", authRouter);
